@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.mall.dao.CartDao">
+	<insert id="addCart" parameterType="Cart">
+		insert into cart(user_id,product_id,quantity,checked,create_time,update_time) 
+		values(${user_id},${product_id},${quantity},1,now(),now())
+	</insert>
+	
+	<delete id="deleteCart" parameterType="integer">
+		delete from cart where id=#{cart_id}
+	</delete>
+	
+	<update id="modifyCart" parameterType="Cart">
+		update cart set quantity=${quantity} where id=${id}
+	</update>
+	
+	<select id="findCart" resultType="Cart" parameterType="integer">
+		select * from cart where user_id=#{user_id}
+	</select>
+	
+	<update id="modifyCartChecked" parameterType="integer">
+		update cart set checked=0 where user_id=#{user_id}
+	</update>
+	
+	<update id="modifyCartCheckedTrue" parameterType="Cart">
+		update cart set checked=1 where id=${id} user_id=${user_id}
+	</update>	
+	
+	<select id="findCartByCartId" parameterType="integer" resultType="Cart">
+		select * from cart where id=#{cart_id}
+	</select>
+	
+	<select id="findCartByNewCart" parameterType="Cart" resultType="Cart">
+		select * from cart where product_id=${product_id} and user_id=${user_id}
+	</select>
+</mapper>

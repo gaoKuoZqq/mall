@@ -1,0 +1,194 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+  
+<mapper namespace="com.mall.dao.ProductDao">
+
+	<resultMap type="Product" id="product">
+		<id property="id" column="id"/>
+		<result property="category_id" column="category_id"/>
+		<result property="category_name" column="category_name"/>
+		<result property="name" column="name"/>
+		<result property="subtitle" column="subtitle"/>
+		<result property="main_image" column="main_image"/>
+		<result property="sub_images" column="sub_images"/>
+		<result property="detail" column="detail"/>
+		<result property="price" column="price"/>
+		<result property="stock" column="stock"/>
+		<result property="status" column="status"/>
+		<result property="create_time" column="create_time"/>
+		<result property="update_time" column="update_time"/>
+	</resultMap>
+	
+	<select id="findProduct" parameterType="PageBean" resultMap="product">
+	SELECT p.id,p.category_id,c.name ascategory_name,p.name,p.subtitle,p.main_image,
+	p.sub_images,p.detail,p.price,p.stock,p.status,p.create_time,p.update_time  
+	FROM product AS p LEFT JOIN category AS c ON p.category_id=c.id
+		<where>
+		<if test="product!=null">
+			<if test="product.id!=null">
+				and p.id=${category.id} 
+			</if>
+			<if test="product.category_id!=null">
+				and p.category_id=${product.category_id} 
+			</if>
+			<if test="product.name!=null">
+				and p.name='${product.name}' 
+			</if>
+			<if test="product.status!=null">
+				and p.status=${product.status} 
+			</if>
+		</if>
+		</where>
+		 limit ${limitStart},${pageSize};
+	</select>
+	
+	<select id="totalProduct" parameterType="PageBean" resultType="integer">
+		select count(*) from product as p
+		<where>
+		<if test="product!=null">
+			<if test="product.id!=null">
+				and p.id=${category.id} 
+			</if>
+			<if test="product.category_id!=null">
+				and p.category_id=${product.category_id} 
+			</if>
+			<if test="product.name!=null">
+				and p.name='${product.name}' 
+			</if>
+			<if test="product.status!=null">
+				and p.status=${product.status} 
+			</if>
+		</if>
+		</where>
+	</select>
+	
+	<delete id="deleteProduct" parameterType="integer">
+		delete from product where id=#{product_id}
+	</delete>
+	
+<!-- 	<update id="modifyProduct" parameterType="Product">
+		UPDATE product
+    	<set>
+    		<if test="name!=null and !&quot;&quot;.equals(name.trim())">
+    		NAME='${name}',
+    		</if>
+    		<if test="subtitle!=null and !&quot;&quot;.equals(subtitle.trim())">
+    		subtitle=${subtitle},
+    		</if>
+    		<if test="main_image!=null and !&quot;&quot;.equals(main_image.trim())">
+    		main_image=${main_image},
+    		</if>
+    		<if test="sub_images!=null and !&quot;&quot;.equals(sub_images.trim())">
+    		sub_images=${sub_images},
+    		</if>
+    		<if test="detail!=null and !&quot;&quot;.equals(detail.trim())">
+    		detail=${detail},
+    		</if>
+    		category_id=${category_id},
+    		price=${price},
+    		stock=${stock},
+    		status=${status},
+    		create_time=now(),
+    		update_time=now(),
+    	</set>
+    	where id=${id};
+	</update> -->
+	
+	<insert id="addProduct" parameterType="Product">
+		<trim  suffix=")" suffixOverrides=",">
+		insert into product (create_time,update_time,name,category_id,main_image,price,stock,status,
+			<if test="subtitle!=null and !&quot;&quot;.equals(subtitle.trim())">
+				subtitle,
+			</if>
+			<if test="sub_images!=null and !&quot;&quot;.equals(sub_images.trim())">
+				sub_images,
+			</if>
+			<if test="detail!=null and !&quot;&quot;.equals(detail.trim())">
+				detail,
+			</if>
+		</trim>
+		<trim suffix=")" suffixOverrides="," >
+		values(now(),now(),'${name}',${category_id},'${main_image}',${price},${stock},${status},
+			<if test="subtitle!=null and !&quot;&quot;.equals(subtitle.trim())">
+				'${subtitle}',
+			</if>
+			<if test="sub_images!=null and !&quot;&quot;.equals(sub_images.trim())">
+				'${sub_images}',
+			</if>
+			<if test="detail!=null and !&quot;&quot;.equals(detail.trim())">
+				'${detail}',
+			</if>
+		</trim>
+	</insert>
+	
+	<update id="modifyProduct" parameterType="Product">
+		UPDATE product
+    	<set>
+    		price=${price},
+    		stock=${stock},
+    		status=${status},
+    		update_time=now(),
+    		<if test="name!=null and !&quot;&quot;.equals(name.trim())">
+    		NAME='${name}',
+    		</if>
+    		<if test="subtitle!=null and !&quot;&quot;.equals(subtitle.trim())">
+    		subtitle='${subtitle}',
+    		</if>
+    		<if test="main_image!=null and !&quot;&quot;.equals(main_image.trim())">
+    		main_image='${main_image}',
+    		</if>
+    		<if test="sub_images!=null and !&quot;&quot;.equals(sub_images.trim())">
+    		sub_images='${sub_images}',
+    		</if>
+    		<if test="detail!=null and !&quot;&quot;.equals(detail.trim())">
+    		detail='${detail}',
+    		</if>
+    	</set>
+    	where id=${id};
+	</update>
+	
+	<select id="findProductById" resultMap="product">
+		select * from product where id=#{product_id}
+	</select>
+	
+	<resultMap type="Product" id="product_serchDisplay">
+		<id property="id" column="id"/>
+		<result property="name" column="name"/>
+		<result property="main_image" column="main_image"/>
+		<result property="price" column="price"/>
+	</resultMap>
+	<select id="findProductByCategoryId" resultMap="product_serchDisplay" parameterType="integer">
+		select product.id,product.name,product.main_image,product.price from product where category_id=#{category_id}
+	</select>
+	
+	<select id="findProductByCategoryIdAndName" parameterType="pageBean" resultType="Product">
+		select p.id,p.name,p.main_image,p.price from product as p
+		<where>
+			<if test="product.category_id!=null">
+				p.category_id=${product.category_id}
+			</if>
+			<if test="product.name!=null and !&quot;&quot;.equals(product.name.trim())" >
+				p.name like '%${product.name}%'
+			</if>
+		</where>
+		limit ${limitStart},${pageSize};
+	</select>
+	
+	<select id="totalProductByCategoryIdAndName" parameterType="pageBean" resultType="integer">
+		select count(*) from product as p
+		<where>
+			<if test="product.category_id!=null">
+				p.category_id=${product.category_id}
+			</if>
+			<if test="product.name!=null and !&quot;&quot;.equals(product.name.trim())" >
+				p.name like '${product.name}'
+			</if>
+		</where>
+	</select>
+	
+	<update id="modifyProductStock" parameterType="Product">
+		update product set stock=${stock} where id=${id}
+	</update>
+</mapper>
